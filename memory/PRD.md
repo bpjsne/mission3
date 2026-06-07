@@ -42,6 +42,25 @@ Build a "Mock Job Interview" web application for staff being re-trained into new
 - ✅ All data-testid attributes for testing
 - ✅ 100% backend + frontend tests passing
 
+## Code Quality Improvements Applied (Feb 2026)
+- ✅ Extracted `useInterview` custom hook (`/src/hooks/useInterview.js`) — resolved all useCallback dep warnings
+- ✅ `parseSSEStream` extracted as standalone testable function
+- ✅ Removed `useCallback` wrappers (plain async functions, no stale closure risk)
+- ✅ Fixed empty catch block → now logs `console.error` with context
+- ✅ `MAX_QUESTIONS = 6`, `FOCUS_DELAY_MS = 100`, `QUERY_STALE_TIME_MS = 60_000` named constants
+- ✅ Fixed React key in Message component (`${message.id}-line-${i}` instead of bare index)
+- ✅ `TypingIndicator` extracted as separate component
+- ✅ Backend: extracted `_stream_opening`, `_stream_chat_response`, `_build_chat`, `_sse_response` helpers
+- ✅ Backend: full return type hints on all route functions
+- ✅ Backend: proper HTTP 400/404 via `HTTPException` instead of JSON 200 error responses
+- ✅ Backend: `CLAUDE_MODEL`, `MIN_QUESTIONS_FOR_EVALUATION` named constants
+- ✅ Tests: `is True` → `== True`, `is` → `==` for literal comparisons
+- ✅ Tests: `_collect_sse_stream` helper extracted to DRY up all tests
+- ✅ Tests: `test_full_interview_flow` split into focused independent tests
+- ✅ Tests: full type hints added to all test methods
+- ✅ `use-toast.js`: fixed `[state]` dep → `[]` (subscribe once on mount, no stale listener accumulation)
+- ✅ `index.js`: `60_000` extracted to `QUERY_STALE_TIME_MS`
+
 ## Prioritized Backlog
 
 ### P0 — Done

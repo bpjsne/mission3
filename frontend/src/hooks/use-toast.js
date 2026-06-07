@@ -136,6 +136,7 @@ function useToast() {
   const [state, setState] = React.useState(memoryState)
 
   React.useEffect(() => {
+    // Subscribe once on mount; setState from useState is guaranteed stable
     listeners.push(setState)
     return () => {
       const index = listeners.indexOf(setState)
@@ -143,7 +144,7 @@ function useToast() {
         listeners.splice(index, 1)
       }
     };
-  }, [state])
+  }, []) // subscribe once on mount; setState from useState is guaranteed stable
 
   return {
     ...state,
