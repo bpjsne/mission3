@@ -1,0 +1,89 @@
+{
+  "theme": "DARK",
+  "archetype": "4 (Swiss & High-Contrast)",
+  "rationale": "For an AI mock interview tool, users need deep focus and clarity. The dark high-contrast Swiss archetype provides a distraction-free, authoritative command-center feel, prioritizing text legibility and explicit hierarchy over decorative elements.",
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "IBM Plex Sans",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl tracking-tighter font-light",
+      "h2": "text-2xl sm:text-3xl tracking-tight font-medium",
+      "h3": "text-xl sm:text-2xl tracking-tight",
+      "h4": "text-lg sm:text-xl",
+      "body": "text-base leading-relaxed",
+      "labels": "text-xs uppercase tracking-[0.2em] font-medium"
+    }
+  },
+  "color_palette": {
+    "background": {
+      "base": "#0A0A0A",
+      "surface": "#121212",
+      "glass": "bg-black/60 backdrop-blur-xl"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A1A1AA",
+      "inverse": "#000000"
+    },
+    "accents": {
+      "primary": "#2563EB", 
+      "primary_hover": "#1D4ED8",
+      "warning": "#EAB308",
+      "border": "rgba(255, 255, 255, 0.1)"
+    }
+  },
+  "spacing_and_layout": {
+    "strategy": "The Control Room Grid",
+    "padding": "Generous paddings (p-6, p-8) for chat containers to allow breathing room.",
+    "border_radius": "Subtle roundness, max 8px border-radius (rounded-md).",
+    "alignment": "Left-align dense text and chat blocks. Center-align the main application container.",
+    "container_classes": "w-full max-w-5xl mx-auto px-4 md:px-8 h-screen flex flex-col"
+  },
+  "components": {
+    "buttons": "Flat, pure geometric styling. Primary button: bg-[#2563EB] text-white hover:bg-[#1D4ED8] hover:-translate-y-0.5 transition-transform duration-200. Secondary: border border-white/20 bg-transparent text-white hover:bg-white/5.",
+    "inputs": "Shadcn defaults stripped of generic roundness. rounded-sm, bg-[#121212] border border-white/20 focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] text-white p-4.",
+    "chat_bubbles": {
+      "ai": "bg-white/5 border border-white/10 rounded-md p-6 left-aligned max-w-[85%]",
+      "user": "bg-[#2563EB] text-white rounded-md p-6 right-aligned ml-auto max-w-[85%]"
+    },
+    "header": "Crystal Glassmorphism: sticky top-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/10 py-4 px-6 flex justify-between items-center"
+  },
+  "interactions_and_motion": {
+    "hover": "Explicit hover states on all interactive elements. Buttons lift slightly (-translate-y-1) with a subtle drop shadow.",
+    "transitions": "transition-all duration-200 ease-out",
+    "chat_entrance": "Message bubbles slide up and fade in staggeredly."
+  },
+  "media": {
+    "background_texture": {
+      "url": "https://images.unsplash.com/photo-1710438399422-2fca27686bcd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhcmslMjBtb2Rlcm4lMjBtZXNoJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3ODA4NzE2NDR8MA&ixlib=rb-4.1.0&q=85",
+      "usage": "Use as a very low opacity (10-15%) fixed background cover to kill digital flatness."
+    },
+    "ai_avatar": {
+      "url": "https://images.pexels.com/photos/8294612/pexels-photo-8294612.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "usage": "Small circular avatar (w-8 h-8) next to the AI's chat messages."
+    }
+  },
+  "page_structure": {
+    "AI_Mock_Interviewer": [
+      "Header: App title 'MockAI' + User Role info.",
+      "Job Setup Section: Input field for Job Title + 'Start Interview' button (hidden once started).",
+      "Progress Indicator: Minimalist textual counter 'Question 1 of 6' with a thin progress bar.",
+      "Chat Display: Scrollable area. Flex column with gap-6. Empty state shows a welcoming message.",
+      "Input Area: Fixed at the bottom of the container. Textarea (auto-expanding) + 'Submit' button.",
+      "Feedback Panel: A conditionally rendered bento grid at the end of the interview summarizing strengths, critique, and tips."
+    ]
+  },
+  "accessibility_and_testing": {
+    "contrast": "Ensure text over #0A0A0A is pure #FFFFFF. User chat text on #2563EB must be pure #FFFFFF.",
+    "test_ids": "Apply data-testid to start-button, job-title-input, chat-input, submit-message-button, feedback-panel, chat-message-user, chat-message-ai."
+  },
+  "instructions_to_main_agent": [
+    "Use raw HTML/Tailwind for the main page layout to maintain the 'Control Room Grid' strictness.",
+    "Use Shadcn components for complex logic (Textarea, ScrollArea, Button) but strictly override their styles to match the Archetype 4 dark high-contrast theme.",
+    "The UI must feel like a focused workspace. Do not use generic card shadows; use 1px solid borders.",
+    "Ensure the chat container auto-scrolls to the bottom when a new message is added.",
+    "Use the AI avatar image next to the interviewer's messages.",
+    "Mock the backend Claude integration if the actual API isn't wired yet, but ensure the frontend logic for dynamic follow-ups (6 questions) and final feedback generation is clear and functional.",
+    "Add yarn add @phosphor-icons/react for high-end technical icons."
+  ]
+}
