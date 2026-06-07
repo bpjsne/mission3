@@ -56,7 +56,7 @@ const Message = ({ message }) => {
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
 const ProgressBar = ({ questionCount, isComplete }) => {
   const MAX = 6;
-  const progress = Math.min((questionCount / MAX) * 100, 100);
+  const progress = Math.min(((questionCount + 1) / MAX) * 100, 100);
 
   return (
     <div className="px-6 py-3 border-b border-white/10 flex items-center gap-4 bg-black/20">
