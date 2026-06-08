@@ -1,8 +1,4 @@
 import React from "react";
-import {
-  Send, RotateCcw, Briefcase, Bot, ChevronRight,
-  Loader2, AlertCircle, Trophy,
-} from "lucide-react";
 import { useInterview, MAX_QUESTIONS } from "./hooks/useInterview";
 import "./App.css";
 
@@ -13,39 +9,33 @@ const Message = ({ message }) => {
 
   return (
     <div
-      className={`flex gap-3 message-enter ${isAI ? "" : "flex-row-reverse"}`}
+      className={`message-wrap ${isAI ? "message-wrap--ai" : "message-wrap--user"}`}
       data-testid={isAI ? "chat-message-ai" : "chat-message-user"}
     >
       {isAI && (
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-lg shadow-blue-600/20">
-          <Bot size={15} className="text-white" />
+        <div className="message-avatar" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
+            <path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+          </svg>
         </div>
       )}
-      <div
-        className={`max-w-[80%] rounded-lg px-4 py-3 ${
-          isAI ? "bg-white/5 border border-white/10 text-white" : "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-        }`}
-      >
-        <p className={`text-[11px] uppercase tracking-[0.15em] font-medium mb-2 ${isAI ? "text-[#A1A1AA]" : "text-blue-200"}`}>
-          {isAI ? "Interviewer" : "You"}
-        </p>
-        <div className="text-sm leading-relaxed">
+      <div className={`message-bubble ${isAI ? "message-bubble--ai" : "message-bubble--user"}`}>
+        <span className="message-label">{isAI ? "Interviewer" : "You"}</span>
+        <div className="message-text">
           {lines.map((line, i) => {
             const isBold = line.startsWith("**") && line.endsWith("**") && line.length > 4;
             const content = isBold ? line.slice(2, -2) : line;
-            // Use message.id + index as stable composite key (lines never reorder within a message)
             return (
               <p
-                key={`${message.id}-line-${i}`}
-                className={`${isBold ? "font-semibold text-white mt-3 mb-1" : ""} ${line === "" ? "h-2" : ""}`}
+                key={`${message.id}-${i}`}
+                className={isBold ? "message-bold" : line === "" ? "message-spacer" : ""}
               >
                 {content}
               </p>
             );
           })}
-          {message.streaming && (
-            <span className="inline-block w-1.5 h-4 bg-white/60 ml-0.5 cursor-blink align-middle" />
-          )}
+          {message.streaming && <span className="cursor-blink" aria-hidden="true" />}
         </div>
       </div>
     </div>
@@ -54,40 +44,38 @@ const Message = ({ message }) => {
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
 const ProgressBar = ({ questionCount, isComplete }) => {
-  const progress = Math.min(((questionCount + 1) / MAX_QUESTIONS) * 100, 100);
+  const pct = Math.min(((questionCount + 1) / MAX_QUESTIONS) * 100, 100);
   return (
-    <div className="px-6 py-3 border-b border-white/10 flex items-center gap-4 bg-black/20">
-      <span className="text-[11px] text-[#A1A1AA] uppercase tracking-widest whitespace-nowrap">
+    <div className="progress-bar">
+      <span className="progress-text">
         {isComplete ? "Interview Complete" : `Question ${questionCount + 1} of ${MAX_QUESTIONS}`}
       </span>
-      <div className="flex-1 h-px bg-white/10 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-blue-600 transition-all duration-700 rounded-full"
-          style={{ width: `${progress}%` }}
-        />
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-[11px] text-[#A1A1AA] whitespace-nowrap">{Math.round(progress)}%</span>
+      <span className="progress-pct">{Math.round(pct)}%</span>
     </div>
   );
 };
 
 // ─── Typing Indicator ─────────────────────────────────────────────────────────
 const TypingIndicator = () => (
-  <div className="flex gap-3 message-enter">
-    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-      <Bot size={15} className="text-white" />
+  <div className="message-wrap message-wrap--ai">
+    <div className="message-avatar" aria-hidden="true">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
+        <path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+      </svg>
     </div>
-    <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-3">
-      <div className="flex gap-1 items-center h-5">
-        <span className="w-2 h-2 bg-[#A1A1AA] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-        <span className="w-2 h-2 bg-[#A1A1AA] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-        <span className="w-2 h-2 bg-[#A1A1AA] rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+    <div className="message-bubble message-bubble--ai">
+      <div className="typing-dots">
+        <span /><span /><span />
       </div>
     </div>
   </div>
 );
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
+// ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   const {
     phase, jobTitle, jobTitleInput, setJobTitleInput,
@@ -99,108 +87,103 @@ function App() {
   const showTypingIndicator = isLoading && messages[messages.length - 1]?.role === "user";
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex flex-col font-body">
-      {/* Background texture */}
-      <div
-        className="fixed inset-0 pointer-events-none bg-cover bg-center"
-        style={{
-          backgroundImage: "url(https://images.unsplash.com/photo-1710438399422-2fca27686bcd?crop=entropy&cs=srgb&fm=jpg&q=85)",
-          opacity: 0.04,
-        }}
-      />
-
+    <div className="app">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-md bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30">
-              <Bot size={15} className="text-white" />
+      <header className="app-header">
+        <div className="header-inner">
+          <div className="header-brand">
+            <div className="header-logo" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
+                <path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+              </svg>
             </div>
             <div>
-              <h1 className="text-base font-semibold tracking-tight text-white leading-none">AI Mock Interviewer</h1>
-              {jobTitle && <p className="text-[11px] text-[#A1A1AA] mt-0.5">{jobTitle}</p>}
+              <h1 className="header-title">AI Mock Interviewer</h1>
+              {jobTitle && <p className="header-subtitle">{jobTitle}</p>}
             </div>
           </div>
           {phase !== "setup" && (
-            <button
-              onClick={handleReset}
-              data-testid="reset-button"
-              className="flex items-center gap-2 text-xs text-[#A1A1AA] hover:text-white border border-white/20 hover:border-white/40 px-3 py-2 rounded-md transition-all duration-200"
-            >
-              <RotateCcw size={13} />
+            <button className="btn-reset" onClick={handleReset} data-testid="reset-button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
               New Interview
             </button>
           )}
         </div>
       </header>
 
-      {/* ── Main Content ── */}
-      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full relative overflow-hidden">
+      {/* ── Main ── */}
+      <main className="app-main">
 
-        {/* ── SETUP SCREEN ── */}
+        {/* ── Setup Screen ── */}
         {phase === "setup" && (
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="w-full max-w-md animate-fade-in">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-full bg-blue-600/15 border border-blue-600/30 flex items-center justify-center mx-auto mb-5">
-                  <Briefcase size={26} className="text-blue-500" />
-                </div>
-                <h2 className="text-2xl font-semibold text-white mb-2 tracking-tight">Ready to practice?</h2>
-                <p className="text-[#A1A1AA] text-sm">Enter the job title you want to interview for</p>
+          <div className="setup-screen">
+            <div className="setup-card">
+              <div className="setup-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
               </div>
+              <h2 className="setup-title">Ready to practice?</h2>
+              <p className="setup-subtitle">Enter the job title you want to interview for</p>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="text-[11px] uppercase tracking-[0.2em] text-[#A1A1AA] block mb-2">
-                    Job Title
-                  </label>
-                  <input
-                    data-testid="job-title-input"
-                    type="text"
-                    value={jobTitleInput}
-                    onChange={(e) => setJobTitleInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleStart()}
-                    placeholder="e.g. Junior Developer, Data Analyst..."
-                    className="w-full bg-[#121212] border border-white/20 rounded-md px-4 py-3 text-white placeholder-[#555] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200"
-                    autoFocus
-                  />
-                </div>
+              <div className="setup-form">
+                <label className="form-label" htmlFor="job-title-input">Job Title</label>
+                <input
+                  id="job-title-input"
+                  data-testid="job-title-input"
+                  type="text"
+                  className="form-input"
+                  value={jobTitleInput}
+                  onChange={(e) => setJobTitleInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleStart()}
+                  placeholder="e.g. Junior Developer, Data Analyst..."
+                  autoFocus
+                />
                 <button
                   data-testid="start-button"
+                  className="btn-start"
                   onClick={handleStart}
                   disabled={!jobTitleInput.trim()}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-md transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
                 >
                   Start Interview
-                  <ChevronRight size={17} />
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                  </svg>
                 </button>
                 {error && (
-                  <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-md p-3 text-red-400 text-xs">
-                    <AlertCircle size={14} />
+                  <div className="error-msg" data-testid="error-message">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+                    </svg>
                     {error}
                   </div>
                 )}
               </div>
-              <p className="text-center text-xs text-[#555] mt-6">
+              <p className="setup-footer">
                 {MAX_QUESTIONS}+ dynamic questions · Real-time AI feedback · Performance evaluation
               </p>
             </div>
           </div>
         )}
 
-        {/* ── INTERVIEW + COMPLETE SCREENS ── */}
+        {/* ── Interview + Complete Screens ── */}
         {(phase === "interview" || phase === "complete") && (
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className="interview-screen">
             <ProgressBar questionCount={questionCount} isComplete={phase === "complete"} />
 
-            {/* Chat messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5 min-h-0">
+            {/* Chat Area */}
+            <div className="chat-area">
               {messages.length === 0 && (
-                <div className="flex items-center justify-center h-full">
-                  <div className="flex items-center gap-2 text-[#A1A1AA] text-sm">
-                    <Loader2 size={16} className="animate-spin" />
-                    Starting your interview...
-                  </div>
+                <div className="chat-loading">
+                  <svg className="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  </svg>
+                  Starting your interview...
                 </div>
               )}
 
@@ -211,62 +194,75 @@ function App() {
               {showTypingIndicator && <TypingIndicator />}
 
               {error && (
-                <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-md p-3 text-red-400 text-sm">
-                  <AlertCircle size={15} />
+                <div className="error-msg inline-error">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
+                  </svg>
                   {error}
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
 
-            {/* Input area */}
+            {/* Input Area */}
             {phase === "interview" && (
-              <div className="border-t border-white/10 p-4 bg-black/30 backdrop-blur-sm">
-                <div className="flex gap-3 items-end">
+              <div className="input-area">
+                <div className="input-row">
                   <textarea
                     ref={inputRef}
                     data-testid="chat-input"
+                    className="chat-textarea"
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your answer... (Enter to submit · Shift+Enter for new line)"
+                    placeholder="Type your answer… (Enter to submit · Shift+Enter for new line)"
                     disabled={isLoading}
                     rows={2}
-                    className="flex-1 bg-[#121212] border border-white/20 rounded-md px-4 py-3 text-white placeholder-[#555] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 resize-none disabled:opacity-40 text-sm"
                   />
                   <button
                     data-testid="submit-message-button"
+                    className="btn-submit"
                     onClick={handleSubmit}
                     disabled={!userInput.trim() || isLoading}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white p-3 rounded-md transition-all duration-200 hover:-translate-y-0.5 flex-shrink-0 shadow-lg shadow-blue-600/20"
                   >
-                    {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+                    {isLoading ? (
+                      <svg className="spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Completion banner */}
+            {/* Completion Banner */}
             {phase === "complete" && (
-              <div data-testid="feedback-panel" className="border-t border-white/10 p-5 bg-black/30 backdrop-blur-sm">
-                <div className="bg-blue-600/10 border border-blue-600/30 rounded-md p-4 flex flex-col sm:flex-row items-center gap-4">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-9 h-9 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
-                      <Trophy size={16} className="text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-blue-300 font-medium text-sm">Interview Complete!</p>
-                      <p className="text-[#A1A1AA] text-xs mt-0.5">Review the evaluation above, then start a new session.</p>
-                    </div>
+              <div className="completion-banner" data-testid="feedback-panel">
+                <div className="completion-content">
+                  <div className="completion-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                      <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                    </svg>
                   </div>
-                  <button
-                    onClick={handleReset}
-                    data-testid="new-interview-button"
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-5 rounded-md transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
-                  >
-                    Start New Interview
-                  </button>
+                  <div>
+                    <p className="completion-title">Interview Complete!</p>
+                    <p className="completion-subtitle">Review the evaluation above, then start a new session.</p>
+                  </div>
                 </div>
+                <button
+                  className="btn-new-interview"
+                  onClick={handleReset}
+                  data-testid="new-interview-button"
+                >
+                  Start New Interview
+                </button>
               </div>
             )}
           </div>
