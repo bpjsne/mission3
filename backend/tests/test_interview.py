@@ -43,8 +43,9 @@ class TestInterviewAPI:
         assert "message" in data
 
     def test_start_interview_missing_body(self) -> None:
+        """Missing entire body defaults to empty; should return 400."""
         response = requests.post(f"{BASE_URL}/api/interview/start", json={})
-        assert response.status_code == 422
+        assert response.status_code == 400
 
     def test_start_interview_empty_title_returns_error(self) -> None:
         """Empty job title should return a 400 HTTP error."""
@@ -52,6 +53,15 @@ class TestInterviewAPI:
             f"{BASE_URL}/api/interview/start",
             json={"job_title": ""},
         )
+        assert response.status_code == 400
+
+    def test_start_interview_missing_body_returns_error(self) -> None:
+        """Missing job_title field should return a 400 HTTP error."""
+        response = requests.post(
+            f"{BASE_URL}/api/interview/start",
+            json={},
+        )
+        # Node.js returns 400 for missing/empty job_title
         assert response.status_code == 400
 
     def test_start_interview_streams_opening_question(self) -> None:

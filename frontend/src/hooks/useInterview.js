@@ -41,7 +41,10 @@ async function parseSSEStream(response, streamId, setMessages, setError, onDone)
             );
             onDone(data);
           } else if (data.error) {
-            setError(data.error);
+            const msg = typeof data.error === 'string' && data.error.includes('401')
+              ? 'AI service authentication failed — please check the API key.'
+              : (typeof data.error === 'string' ? data.error : 'An error occurred. Please try again.');
+            setError(msg);
             setMessages((prev) => prev.filter((m) => m.id !== streamId));
           }
         } catch (parseError) {
