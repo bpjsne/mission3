@@ -2,6 +2,20 @@ import React from "react";
 import { useInterview, MAX_QUESTIONS } from "./hooks/useInterview";
 import "./App.css";
 
+// ─── Microsoft Copilot Logo SVG ───────────────────────────────────────────────
+const CopilotIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Microsoft Copilot">
+    {/* Blue petal — top-left */}
+    <path d="M50,50 C45,35 30,25 18,32 C8,40 12,55 25,55 C40,56 50,50 50,50Z" fill="#0078D4"/>
+    {/* Pink petal — top-right */}
+    <path d="M50,50 C65,45 75,30 68,18 C60,8 45,12 45,25 C44,40 50,50 50,50Z" fill="#EB3C96"/>
+    {/* Yellow petal — bottom-right */}
+    <path d="M50,50 C55,65 70,75 82,68 C92,60 88,45 75,45 C60,44 50,50 50,50Z" fill="#FFB900"/>
+    {/* Green petal — bottom-left */}
+    <path d="M50,50 C35,55 25,70 32,82 C40,92 55,88 55,75 C56,60 50,50 50,50Z" fill="#00CC6A"/>
+  </svg>
+);
+
 // ─── Message Bubble ───────────────────────────────────────────────────────────
 const Message = ({ message }) => {
   const isAI = message.role === "ai";
@@ -14,10 +28,7 @@ const Message = ({ message }) => {
     >
       {isAI && (
         <div className="message-avatar" aria-hidden="true">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
-            <path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
-          </svg>
+          <CopilotIcon size={16} />
         </div>
       )}
       <div className={`message-bubble ${isAI ? "message-bubble--ai" : "message-bubble--user"}`}>
@@ -43,7 +54,7 @@ const Message = ({ message }) => {
 };
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
-const ProgressBar = ({ questionCount, isComplete }) => {
+const ProgressBar = ({ questionCount, isComplete, onReset }) => {
   const pct = Math.min(((questionCount + 1) / MAX_QUESTIONS) * 100, 100);
   return (
     <div className="progress-bar">
@@ -54,6 +65,13 @@ const ProgressBar = ({ questionCount, isComplete }) => {
         <div className="progress-fill" style={{ width: `${pct}%` }} />
       </div>
       <span className="progress-pct">{Math.round(pct)}%</span>
+      <button className="btn-reset" onClick={onReset} data-testid="reset-button">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        New
+      </button>
     </div>
   );
 };
@@ -62,10 +80,7 @@ const ProgressBar = ({ questionCount, isComplete }) => {
 const TypingIndicator = () => (
   <div className="message-wrap message-wrap--ai">
     <div className="message-avatar" aria-hidden="true">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
-        <path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
-      </svg>
+      <CopilotIcon size={16} />
     </div>
     <div className="message-bubble message-bubble--ai">
       <div className="typing-dots">
@@ -88,33 +103,6 @@ function App() {
 
   return (
     <div className="app">
-      {/* ── Header ── */}
-      <header className="app-header">
-        <div className="header-inner">
-          <div className="header-brand">
-            <div className="header-logo" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/>
-                <path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
-              </svg>
-            </div>
-            <div>
-              <h1 className="header-title">AI Mock Interviewer</h1>
-              {jobTitle && <p className="header-subtitle">{jobTitle}</p>}
-            </div>
-          </div>
-          {phase !== "setup" && (
-            <button className="btn-reset" onClick={handleReset} data-testid="reset-button">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-              </svg>
-              New Interview
-            </button>
-          )}
-        </div>
-      </header>
-
       {/* ── Main ── */}
       <main className="app-main">
 
@@ -123,10 +111,7 @@ function App() {
           <div className="setup-screen">
             <div className="setup-card">
               <div className="setup-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                </svg>
+                <CopilotIcon size={40} />
               </div>
               <h2 className="setup-title">Ready to practice?</h2>
               <p className="setup-subtitle">Enter the job title you want to interview for</p>
@@ -174,7 +159,7 @@ function App() {
         {/* ── Interview + Complete Screens ── */}
         {(phase === "interview" || phase === "complete") && (
           <div className="interview-screen">
-            <ProgressBar questionCount={questionCount} isComplete={phase === "complete"} />
+            <ProgressBar questionCount={questionCount} isComplete={phase === "complete"} onReset={handleReset} />
 
             {/* Chat Area */}
             <div className="chat-area">
