@@ -160,6 +160,8 @@
   padding: 0.75rem 1rem;
   color: #f87171;
   font-size: 0.8125rem;
+  position: relative;
+  z-index: 1;
 }
 .inline-error {
   margin: 0 1.5rem;
@@ -246,6 +248,16 @@
   flex-direction: column;
   gap: 1.25rem;
   min-height: 0;
+  position: relative;
+}
+
+/* Canvas background — sits behind all chat content */
+.chat-bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
 }
 
 .chat-area::-webkit-scrollbar { width: 4px; }
@@ -261,6 +273,8 @@
   height: 100%;
   color: var(--text-secondary);
   font-size: 0.875rem;
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Messages ── */
@@ -268,6 +282,8 @@
   display: flex;
   gap: 0.75rem;
   animation: msgIn 0.22s ease-out;
+  position: relative;
+  z-index: 1;
 }
 .message-wrap--user {
   flex-direction: row-reverse;

@@ -2,14 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
-const Anthropic = require('@anthropic-ai/sdk');
+const OpenAI = require('openai');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 8002;
 
-// ── Anthropic client (authenticates via process.env.ANTHROPIC_API_KEY) ──
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// ── LLM client (Emergent proxy — OpenAI-compatible) ──
+const llm = new OpenAI({
+  apiKey: process.env.EMERGENT_LLM_KEY,
+  baseURL: process.env.EMERGENT_PROXY_URL,
+});
 
 // ── MongoDB ──
 const mongoClient = new MongoClient(process.env.MONGO_URL);
@@ -99,19 +102,23 @@ app.post('/api/interview/start', async (req, res) => {
     initSSE(res);
 
     let fullResponse = '';
-    const stream = anthropic.messages.stream({
+    const stream = await llm.chat.completions.create({
       model: CLAUDE_MODEL,
       max_tokens: 1024,
-      system: getSystemMessage(job_title.trim()),
-      messages: [triggerMsg],
+      stream: true,
+      messages: [
+        { role: 'system', content: getSystemMessage(job_title.trim()) },
+        { role: 'user',   content: 'START_INTERVIEW' },
+      ],
     });
 
-    stream.on('text', (text) => {
-      fullResponse += text;
-      sendSSE(res, { token: text });
-    });
-
-    await stream.finalMessage();
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || '';
+      if (text) {
+        fullResponse += text;
+        sendSSE(res, { token: text });
+      }
+    }
 
     await db.collection('interview_sessions').updateOne(
       { session_id: sessionId },
@@ -165,19 +172,23 @@ app.post('/api/interview/chat', async (req, res) => {
     initSSE(res);
 
     let fullResponse = '';
-    const stream = anthropic.messages.stream({
+    const stream = await llm.chat.completions.create({
       model: CLAUDE_MODEL,
       max_tokens: 2048,
-      system: getSystemMessage(session.job_title),
-      messages: messagesForAPI,
+      stream: true,
+      messages: [
+        { role: 'system', content: getSystemMessage(session.job_title) },
+        ...messagesForAPI.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
+      ],
     });
 
-    stream.on('text', (text) => {
-      fullResponse += text;
-      sendSSE(res, { token: text });
-    });
-
-    await stream.finalMessage();
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || '';
+      if (text) {
+        fullResponse += text;
+        sendSSE(res, { token: text });
+      }
+    }
 
     const aiUpdate = { $push: { messages: { role: 'assistant', content: fullResponse } } };
     if (isFinal) aiUpdate.$set = { is_complete: true };

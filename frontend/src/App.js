@@ -250,6 +250,7 @@ function App() {
 
             {/* Chat Area */}
             <div className="chat-area">
+              <ChatBackground />
               {messages.length === 0 && (
                 <div className="chat-loading">
                   <svg className="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
