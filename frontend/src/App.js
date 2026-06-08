@@ -64,13 +64,12 @@ const ChatBackground = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const parent = canvas?.parentElement;
-    if (!canvas || !parent) return;
+    if (!canvas) return;
 
     const render = () => {
       const dpr = window.devicePixelRatio || 1;
-      const w = parent.clientWidth;
-      const h = parent.clientHeight;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       canvas.width  = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width  = `${w}px`;
@@ -81,9 +80,8 @@ const ChatBackground = () => {
     };
 
     render();
-    const ro = new ResizeObserver(render);
-    ro.observe(parent);
-    return () => ro.disconnect();
+    window.addEventListener("resize", render);
+    return () => window.removeEventListener("resize", render);
   }, []);
 
   return <canvas ref={canvasRef} className="chat-bg-canvas" aria-hidden="true" />;
@@ -190,6 +188,7 @@ function App() {
 
   return (
     <div className="app">
+      <ChatBackground />
       {/* ── Main ── */}
       <main className="app-main">
 
@@ -250,7 +249,6 @@ function App() {
 
             {/* Chat Area */}
             <div className="chat-area">
-              <ChatBackground />
               {messages.length === 0 && (
                 <div className="chat-loading">
                   <svg className="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

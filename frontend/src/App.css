@@ -25,7 +25,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font);
 }
@@ -38,6 +37,8 @@
   max-width: 56rem;
   margin: 0 auto;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 /* ═══════════════════════════════════════
@@ -248,13 +249,14 @@
   flex-direction: column;
   gap: 1.25rem;
   min-height: 0;
-  position: relative;
 }
 
-/* Canvas background — sits behind all chat content */
+/* Canvas background — fixed, covers the full viewport behind everything */
 .chat-bg-canvas {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
   display: block;

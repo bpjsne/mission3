@@ -41,7 +41,7 @@ Build a "Mock Job Interview" web application for staff being re-trained into new
 - ✅ Frontend rewritten with **plain CSS** (no Tailwind) — semantic class names in `App.css`
 - ✅ `index.css` cleared of all `@tailwind` / `@apply` directives
 - ✅ User-friendly error messages for API authentication failures
-- ✅ **HTML5 Canvas background** (`ChatBackground` component) renders dark flowing contour-line texture in chat view
+- ✅ **HTML5 Canvas background** (`ChatBackground` component) renders as a **full-page fixed background** — dark flowing contour-line wave texture covers the entire viewport on all screens/phases
 
 ## What's Been Implemented (Feb 2026)
 - ✅ Full MVP: setup screen, interview flow, 6+ questions, final feedback
