@@ -1,6 +1,93 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { useInterview, MAX_QUESTIONS } from "./hooks/useInterview";
 import "./App.css";
+
+// ─── Wave Background Canvas ───────────────────────────────────────────────────
+function drawWaveBackground(ctx, W, H) {
+  // Very dark base — match the reference image
+  ctx.fillStyle = "#050505";
+  ctx.fillRect(0, 0, W, H);
+
+  const N = 90; // number of contour lines
+
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1); // 0 = top, 1 = bottom
+
+    // Slightly compress lines toward top (perspective depth)
+    const baseY = H * Math.pow(t, 0.88);
+
+    // Warm dark-gray line colour — brightest around mid-range
+    const lum = Math.round(14 + Math.sin(t * Math.PI) * 42);
+    const alpha = 0.28 + t * 0.52;
+    ctx.strokeStyle = `rgba(${lum + 7}, ${lum + 2}, ${lum - 2}, ${alpha})`;
+    ctx.lineWidth = 0.3 + t * 0.7;
+
+    ctx.beginPath();
+
+    for (let px = 0; px <= W; px += 2) {
+      const nx = px / W;          // 0..1
+      const cx = nx - 0.5;        // -0.5..0.5, 0 = center
+
+      // ── Funnel/arch ──────────────────────────────────────────────
+      // Top lines arch DOWN at center, creating the tunnel/vortex look.
+      // Formula: (1 - 4·cx²) peaks at 1 in the center, hits 0 at the edges.
+      const archStr = Math.pow(1 - t, 1.9);
+      const arch    = archStr * H * 0.32 * (1 - 4 * cx * cx);
+
+      // ── Waves ──────────────────────────────────────────────────────
+      // Amplitude grows toward bottom; multiple harmonics for complexity.
+      const wA = t * 62 + 5;
+      const wave =
+        Math.sin(nx * Math.PI * 4.3)          * wA * 0.55 +
+        Math.sin(nx * Math.PI * 8.1  + 1.4)  * wA * 0.27 +
+        Math.sin(nx * Math.PI * 13.7 + 3.1)  * wA * 0.14 +
+        Math.sin(nx * Math.PI * 2.1  + 5.8)  * wA * 0.20;
+
+      const y = baseY + arch + wave;
+      if (px === 0) ctx.moveTo(px, y);
+      else          ctx.lineTo(px, y);
+    }
+
+    ctx.stroke();
+  }
+
+  // Vignette: darken edges so messages read well
+  const vignette = ctx.createRadialGradient(W / 2, H / 2, H * 0.1, W / 2, H / 2, H * 0.85);
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,0.55)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, H);
+}
+
+const ChatBackground = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const parent = canvas?.parentElement;
+    if (!canvas || !parent) return;
+
+    const render = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const w = parent.clientWidth;
+      const h = parent.clientHeight;
+      canvas.width  = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width  = `${w}px`;
+      canvas.style.height = `${h}px`;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      drawWaveBackground(ctx, w, h);
+    };
+
+    render();
+    const ro = new ResizeObserver(render);
+    ro.observe(parent);
+    return () => ro.disconnect();
+  }, []);
+
+  return <canvas ref={canvasRef} className="chat-bg-canvas" aria-hidden="true" />;
+};
 
 // ─── Microsoft Copilot Logo SVG ───────────────────────────────────────────────
 const CopilotIcon = ({ size = 24 }) => (
