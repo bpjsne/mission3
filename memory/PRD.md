@@ -36,12 +36,12 @@ Build a "Mock Job Interview" web application for staff being re-trained into new
 ## Stack Migration to Node.js (Feb 2026)
 - ✅ Backend migrated to **Node.js Express** (`/app/backend/server.js`) running on port 8002
 - ✅ Python `server.py` acts as transparent reverse-proxy (supervisor constraint: uvicorn on 8001)
-- ✅ `@anthropic-ai/sdk` v0.102.0 used for Claude streaming (`process.env.ANTHROPIC_API_KEY`)
-- ✅ Conversation history managed in MongoDB + passed to Anthropic API per request
+- ✅ Switched from `@anthropic-ai/sdk` to `openai` npm package using **Emergent LLM proxy** (`https://integrations.emergentagent.com/llm`) — OpenAI-compatible, uses `EMERGENT_LLM_KEY`
+- ✅ Conversation history managed in MongoDB + passed to LLM API per request
 - ✅ Frontend rewritten with **plain CSS** (no Tailwind) — semantic class names in `App.css`
 - ✅ `index.css` cleared of all `@tailwind` / `@apply` directives
-- ✅ User-friendly error messages for 401 API authentication failures
-- ⚠️ ANTHROPIC_API_KEY needs replacement (user's key was auto-revoked after being shared)
+- ✅ User-friendly error messages for API authentication failures
+- ✅ **HTML5 Canvas background** (`ChatBackground` component) renders dark flowing contour-line texture in chat view
 
 ## What's Been Implemented (Feb 2026)
 - ✅ Full MVP: setup screen, interview flow, 6+ questions, final feedback
